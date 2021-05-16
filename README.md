@@ -7,6 +7,7 @@ Repository for conducting performance tests on Apple's new M1 chip
 ### Series 1 (External Comparison)
 
 #### Intel / AMD CPU vs M1 CPU
+
 1. x86 CPU vs M1 CPU (ARM) Single Core
 2. x86 CPU vs M1 CPU (ARM) OMP
 3. x86 CPU vs M1 CPU (ARM) MPI
@@ -15,6 +16,7 @@ Repository for conducting performance tests on Apple's new M1 chip
 6. x86 CPU vs M1 CPU (Rosetta) MPI
 
 #### CUDA vs M1 GPU
+
 Note: Not sure how ARM-Rosetta works for GPU, just a preliminary guess.
 
 1. CUDA vs M1 GPU (ARM)
@@ -38,4 +40,9 @@ For each category above test the following.
 3. ...
 
 ### Metrics
+
+For each category and testable above measure the following.
+
 1. Clock time. 
+2. ...
+3. ...
