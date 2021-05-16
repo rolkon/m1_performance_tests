@@ -35,7 +35,7 @@ Note: Not sure how ARM-Rosetta works for GPU, just a preliminary guess.
 
 For each category above test the following.
 
-1. **Baseline**: matrix multiplication for sqaure matrices of size 10, 100, 1000.
+1. **Baseline**: matrix multiplication of square matrices of size 10, 100, 1000.
 2. ...
 3. ...
 
