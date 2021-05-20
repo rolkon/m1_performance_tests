@@ -17,10 +17,8 @@ Repository for conducting performance tests on Apple's new M1 chip
 
 #### CUDA vs M1 GPU
 
-Note: Not sure how ARM-Rosetta works for GPU, just a preliminary guess.
-
-1. CUDA vs M1 GPU (ARM)
-2. CUDA vs M1 GPU (Rosetta)
+1. CUDA vs M1 GPU (without copying buffer, just computation)
+2. CUDA vs M1 GPU (with copying buffer - check speedup as compared to "slower" transfer in CUDA)
 
 ### Series 2 (Internal Comparison)
 
