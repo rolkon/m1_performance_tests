@@ -1,2 +1,1 @@
-8k_mountains_colorswapped.ppm filter=lfs diff=lfs merge=lfs -text
-8k_mountains.ppm filter=lfs diff=lfs merge=lfs -text
+*.ppm
