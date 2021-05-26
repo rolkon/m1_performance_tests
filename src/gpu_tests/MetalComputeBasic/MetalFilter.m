@@ -5,14 +5,11 @@ Abstract:
 A class to manage all of the Metal objects this app creates.
 */
 
-#import "MetalAdder.h"
+#import "MetalFilter.h"
 #import "ppm_file_reader.h"
+#import <stdlib.h>
 
-// The number of floats in each array, and the size of the arrays in bytes.
-//const unsigned int arrayLength = 1 << 24;
-//const unsigned int bufferSize = arrayLength * sizeof(float);
-
-@implementation MetalAdder
+@implementation MetalFilter
 {
     id<MTLDevice> _mDevice;
 
@@ -22,14 +19,14 @@ A class to manage all of the Metal objects this app creates.
     // The command queue used to pass commands to the device.
     id<MTLCommandQueue> _mCommandQueue;
 
-    // Buffers to hold data.
-    //id<MTLBuffer> _mBufferA;
-    //id<MTLBuffer> _mBufferB;
+    // Buffers to hold image data, as well as result after convolution.
     id<MTLBuffer> _mBufferImg;
     id<MTLBuffer> _mBufferResult;
+    id<MTLBuffer> _mBufferKernel;
+    id<MTLBuffer> _mBufferShape;
+    id<MTLBuffer> _mBufferDebug;
     
-    int sizeX, sizeY;
-    size_t imgSize;
+    PPMImageShape img_shape;
 }
 
 - (instancetype) initWithDevice: (id<MTLDevice>) device
@@ -50,10 +47,10 @@ A class to manage all of the Metal objects this app creates.
             return nil;
         }
 
-        id<MTLFunction> addFunction = [defaultLibrary newFunctionWithName:@"switch_color_channels"];
+        id<MTLFunction> addFunction = [defaultLibrary newFunctionWithName:@"convolution"];
         if (addFunction == nil)
         {
-            NSLog(@"Failed to find the adder function.");
+            NSLog(@"Failed to find function.");
             return nil;
         }
 
@@ -85,20 +82,27 @@ A class to manage all of the Metal objects this app creates.
     //convert NSString to c-string
     const char* img_path = [path UTF8String];
     PPMImage* img = readPPM(img_path);
-    sizeX = img->x;
-    sizeY = img->y;
+    img_shape.x = img->x;
+    img_shape.y = img->y;
+    img_shape.size = img->x * img->y;
+    img_shape.memory = img_shape.size * sizeof(PPMPixel);
     
-    imgSize = sizeX * sizeY * sizeof(PPMPixel);
+    //initialize buffer by without allocation by referencing the existing pixel data
+    _mBufferImg = [_mDevice newBufferWithBytesNoCopy:(void*)img->data length:img_shape.memory options:MTLResourceStorageModeShared deallocator:nil];
     
-    _mBufferImg = [_mDevice newBufferWithBytesNoCopy:(void*)img->data length:imgSize options:MTLResourceStorageModeShared deallocator:nil];
+    //allocate result, kernel and size buffers
+    _mBufferResult  = [_mDevice newBufferWithLength:img_shape.memory options:MTLResourceStorageModeShared];
+    _mBufferShape   = [_mDevice newBufferWithLength:sizeof(PPMImageShape) options:MTLResourceStorageModeShared];
     
-    // Allocate three buffers to hold our initial data and the result.
-    //_mBufferA = [_mDevice newBufferWithLength:bufferSize options:MTLResourceStorageModeShared];
-    //_mBufferB = [_mDevice newBufferWithLength:bufferSize options:MTLResourceStorageModeShared];
-    _mBufferResult = [_mDevice newBufferWithLength:imgSize options:MTLResourceStorageModeShared];
+    //init buffer for debug purposes
+    _mBufferDebug   = [_mDevice newBufferWithLength:img_shape.size*sizeof(int) options:MTLResourceStorageModeShared];
     
-    //[self generateRandomFloatData:_mBufferA];
-    //[self generateRandomFloatData:_mBufferB];
+    PPMImageShape* shapeBufferPtr = _mBufferShape.contents;
+    
+    shapeBufferPtr->x       = img_shape.x;
+    shapeBufferPtr->y       = img_shape.y;
+    shapeBufferPtr->size    = img_shape.size;
+    shapeBufferPtr->memory  = img_shape.memory;
 }
 
 - (void) writeImageFromBufferToPath:(NSString *)path
@@ -107,14 +111,34 @@ A class to manage all of the Metal objects this app creates.
     
     PPMImage* img = (PPMImage*) malloc(sizeof(PPMImage));
     
-    img->x = sizeX;
-    img->y = sizeY;
+    img->x = img_shape.x;
+    img->y = img_shape.y;
     img->data = _mBufferResult.contents;
     
     writePPM(img_path, img);
     
     //img->data will be released automatically
     free(img);
+}
+
+- (void) printDebugBufferFrom:(int) start to:(int) end
+{
+    for(int i=start; i<end; i++)
+    {
+        printf("%d\n", ((int*)_mBufferDebug.contents)[i]);
+    }
+}
+
+- (void) initializeSmoothingKernel5x5
+{
+    _mBufferKernel  = [_mDevice newBufferWithLength:sizeof(float)*9*9 options:MTLResourceStorageModeShared];
+    
+    float*  kernelPtr = _mBufferKernel.contents;
+    
+    for(int i=0; i<9*9; i++)
+    {
+        kernelPtr[i] = 1./81.;
+    }
 }
 
 - (void) sendComputeCommand
@@ -127,7 +151,7 @@ A class to manage all of the Metal objects this app creates.
     id<MTLComputeCommandEncoder> computeEncoder = [commandBuffer computeCommandEncoder];
     assert(computeEncoder != nil);
 
-    [self encodeAddCommand:computeEncoder];
+    [self encodeConvolutionCommand:computeEncoder];
 
     // End the compute pass.
     [computeEncoder endEncoding];
@@ -138,26 +162,28 @@ A class to manage all of the Metal objects this app creates.
     // Normally, you want to do other work in your app while the GPU is running,
     // but in this example, the code simply blocks until the calculation is complete.
     [commandBuffer waitUntilCompleted];
-
+    
     //[self verifyResults];
 }
 
-- (void)encodeAddCommand:(id<MTLComputeCommandEncoder>)computeEncoder {
+- (void)encodeConvolutionCommand:(id<MTLComputeCommandEncoder>)computeEncoder {
 
     // Encode the pipeline state object and its parameters.
     [computeEncoder setComputePipelineState:_mAddFunctionPSO];
-    //[computeEncoder setBuffer:_mBufferA offset:0 atIndex:0];
-    //[computeEncoder setBuffer:_mBufferB offset:0 atIndex:1];
     [computeEncoder setBuffer:_mBufferImg offset:0 atIndex:0];
     [computeEncoder setBuffer:_mBufferResult offset:0 atIndex:1];
+    [computeEncoder setBuffer:_mBufferKernel offset:0 atIndex:2];
+    [computeEncoder setBuffer: _mBufferShape offset:0 atIndex: 3];
+    [computeEncoder setBuffer:_mBufferDebug offset:0 atIndex:4];
 
-    MTLSize gridSize = MTLSizeMake(imgSize, 1, 1);
+    MTLSize gridSize = MTLSizeMake(img_shape.size, 1, 1);
 
     // Calculate a threadgroup size.
     NSUInteger threadGroupSize = _mAddFunctionPSO.maxTotalThreadsPerThreadgroup;
-    if (threadGroupSize > imgSize)
+    
+    if (threadGroupSize > img_shape.size)
     {
-        threadGroupSize = imgSize;
+        threadGroupSize = img_shape.size;
     }
     MTLSize threadgroupSize = MTLSizeMake(threadGroupSize, 1, 1);
 
@@ -165,33 +191,4 @@ A class to manage all of the Metal objects this app creates.
     [computeEncoder dispatchThreads:gridSize
               threadsPerThreadgroup:threadgroupSize];
 }
-/*
-- (void) generateRandomFloatData: (id<MTLBuffer>) buffer
-{
-    float* dataPtr = buffer.contents;
-
-    for (unsigned long index = 0; index < imgSize; index++)
-    {
-        dataPtr[index] = (float)rand()/(float)(RAND_MAX);
-    }
-}
-- (void) verifyResults
-{
-    //float* a = _mBufferA.contents;
-    //float* b = _mBufferB.contents;
-    char* img = _mBufferImg.contents;
-    char* result = _mBufferResult.contents;
-
-    for (unsigned long index = 0; index < arrayLength; index++)
-    {
-        if (result[index] != (a[index] + b[index]))
-        {
-            printf("Compute ERROR: index=%lu result=%g vs %g=a+b\n",
-                   index, result[index], a[index] + b[index]);
-            assert(result[index] == (a[index] + b[index]));
-        }
-    }
-    printf("Compute results as expected\n");
-}
-*/
 @end

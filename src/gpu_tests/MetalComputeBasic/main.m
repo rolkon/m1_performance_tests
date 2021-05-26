@@ -7,20 +7,7 @@ An app that performs a simple calculation on a GPU.
 
 #import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
-#import "MetalAdder.h"
-
-// This is the C version of the function that the sample
-// implements in Metal Shading Language.
-void add_arrays(const float* inA,
-                const float* inB,
-                float* result,
-                int length)
-{
-    for (int index = 0; index < length ; index++)
-    {
-        result[index] = inA[index] + inB[index];
-    }
-}
+#import "MetalFilter.h"
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
@@ -29,15 +16,20 @@ int main(int argc, const char * argv[]) {
 
         // Create the custom object used to encapsulate the Metal code.
         // Initializes objects to communicate with the GPU.
-        MetalAdder* adder = [[MetalAdder alloc] initWithDevice:device];
+        MetalFilter* filter = [[MetalFilter alloc] initWithDevice:device];
         
-        // Create buffers to hold data
-        [adder loadImageFromPathIntoBuffer:@"Data/8k_mountains.ppm"];
+        // Load image file into the buffers
+        [filter loadImageFromPathIntoBuffer:@"Data/32k_death_valley.ppm"];
+        
+        // init the kernel
+        [filter initializeSmoothingKernel5x5];
         
         // Send a command to the GPU to perform the calculation.
-        [adder sendComputeCommand];
+        [filter sendComputeCommand];
         
-        [adder writeImageFromBufferToPath:@"Data/8k_mountains_colorswapped.ppm"];
+        [filter writeImageFromBufferToPath:@"Data/32k_death_valley_blurry.ppm"];
+        
+//        [filter printDebugBufferFrom:0 to:81];
 
         NSLog(@"Execution finished");
     }

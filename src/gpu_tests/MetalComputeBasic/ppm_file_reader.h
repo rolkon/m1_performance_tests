@@ -16,6 +16,13 @@ typedef struct {
     PPMPixel *data;
 } PPMImage;
 
+//dimensions x and y, size = x*y, memory = size * sizeof(PPMPixel)
+typedef struct {
+    unsigned int x, y;
+    unsigned int size;
+    unsigned int memory;
+} PPMImageShape;
+
 #define CREATOR "RPFELGUEIRAS"
 #define RGB_COMPONENT_COLOR 255
 
@@ -67,6 +74,8 @@ static PPMImage *readPPM(const char *filename)
         exit(1);
     }
     
+    printf("Image size: x: %d, y: %d\n", img->x, img->y);
+    
     //read rgb component
     if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
         fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
@@ -90,7 +99,7 @@ static PPMImage *readPPM(const char *filename)
     }
     
     //read pixel data from file
-    if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
+    if (fread(img->data, sizeof(PPMPixel) * img->x, img->y, fp) != img->y) {
         fprintf(stderr, "Error loading image '%s'\n", filename);
         exit(1);
     }
