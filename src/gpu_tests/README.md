@@ -33,5 +33,5 @@ For the CUDA cores, two time measurements are taken: One with the memory copying
 | Device | 8k image | 16k image | 32k image |
 |--------|----------|-----------|-----------|
 | Apple M1 |27.862ms|110.968ms|693.968ms|
-| Nvidia Tesla M60|797.6ms (no copy), 885.95ms (copy)|2534.57ms (no copy), 2882.694ms (copy)|13437.42ms (no copy), 15118.365ms (copy)|
+| Nvidia Tesla M60|797.6ms (no copy), 884.95ms (copy)|2534.57ms (no copy), 2882.694ms (copy)|13437.42ms (no copy), 15118.365ms (copy)|
 | Nvidia Tesla T4|195.3ms (no copy), 284.72ms (copy)|748.17ms (no copy), 1082.1ms (copy)|4910.34ms (no copy), 6243.77ms (copy)|
