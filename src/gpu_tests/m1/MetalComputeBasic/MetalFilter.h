@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) loadImageFromPathIntoBuffer: (NSString*) path;
 - (void) writeImageFromBufferToPath: (NSString*) path;
 - (void) printDebugBufferFrom: (int) start to:(int) end;
-- (void) initializeSmoothingKernel5x5;
+- (void) initializeSmoothingKernel9x9;
 - (void) sendComputeCommand;
 @end
 

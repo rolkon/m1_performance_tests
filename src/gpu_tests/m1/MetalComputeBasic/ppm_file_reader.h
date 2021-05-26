@@ -74,8 +74,6 @@ static PPMImage *readPPM(const char *filename)
         exit(1);
     }
     
-    printf("Image size: x: %d, y: %d\n", img->x, img->y);
-    
     //read rgb component
     if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
         fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
@@ -130,8 +128,6 @@ void writePPM(const char *filename, PPMImage *img)
     // rgb component depth
     fprintf(fp, "%d\n",RGB_COMPONENT_COLOR);
     
-    // pixel data
-    printf("size x: %d, size y: %d\n", img->x, img->y);
     fwrite(img->data, 3 * img->x, img->y, fp);
     fclose(fp);
 }

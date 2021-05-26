@@ -129,7 +129,7 @@ A class to manage all of the Metal objects this app creates.
     }
 }
 
-- (void) initializeSmoothingKernel5x5
+- (void) initializeSmoothingKernel9x9
 {
     _mBufferKernel  = [_mDevice newBufferWithLength:sizeof(float)*9*9 options:MTLResourceStorageModeShared];
     
