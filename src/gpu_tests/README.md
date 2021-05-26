@@ -5,3 +5,7 @@ This example was taken from https://developer.apple.com/documentation/metal/basi
 ## Overview
 
 This code snipped uses Apples' Metal Shading Language to run a convolution operation on the GPU. The performance of the M1 GPU is compared with a NVidia Tesla M60 from Skoltechs' Zhores supercomputer, as well as GPUs from Google Colab.
+
+## Code
+
+The shader is implemented in the Metal Shading Language, the auxiliary code is implemented in Objective-C.
