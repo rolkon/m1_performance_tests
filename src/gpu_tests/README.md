@@ -28,6 +28,10 @@ For the test, three devices are compared:
 
 For the CUDA cores, two time measurements are taken: One with the memory copying operations included, and one without. Since the M1 shares all of its memory between the CPU and the GPU, such a measurement is not necessary for the M1.
 
+The Google Colab notebook can be accessed here:
+
+https://colab.research.google.com/drive/1VEVhkKbPCU0GK34iTDVMPml3MinYr7Ed?usp=sharing
+
 ## Results
 
 | Device | 8k image | 16k image | 32k image |
