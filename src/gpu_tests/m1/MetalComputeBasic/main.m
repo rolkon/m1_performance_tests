@@ -19,7 +19,7 @@ int main(int argc, const char * argv[]) {
         MetalFilter* filter = [[MetalFilter alloc] initWithDevice:device];
         
         // Load image file into the buffers
-        [filter loadImageFromPathIntoBuffer:@"Data/32k_death_valley.ppm"];
+        [filter loadImageFromPathIntoBuffer:@"../data/32k_death_valley.ppm"];
         
         // init the kernel
         [filter initializeSmoothingKernel5x5];
@@ -27,7 +27,7 @@ int main(int argc, const char * argv[]) {
         // Send a command to the GPU to perform the calculation.
         [filter sendComputeCommand];
         
-        [filter writeImageFromBufferToPath:@"Data/32k_death_valley_blurry.ppm"];
+        [filter writeImageFromBufferToPath:@"../data/32k_death_valley_blurry.ppm"];
         
 //        [filter printDebugBufferFrom:0 to:81];
 

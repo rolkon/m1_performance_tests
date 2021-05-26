@@ -36,7 +36,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/rkonlechner/Documents/University/Skoltech/2ndSemester/HPC/m1_performance_tests/src/gpu_tests"
+      customWorkingDirectory = "/Users/rkonlechner/Documents/University/Skoltech/2ndSemester/HPC/m1_performance_tests/src/gpu_tests/m1"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"

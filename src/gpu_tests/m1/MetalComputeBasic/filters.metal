@@ -20,19 +20,7 @@ typedef struct {
 
 using namespace metal;
 
-//kernel void switch_color_channels(device const PPMPixel* in,
-//                                  device PPMPixel* out,
-//                                  device uint* debug,
-//                                  uint index [[thread_position_in_grid]])
-//{
-//    out[index].red = in[index].green;
-//    out[index].green = in[index].blue;
-//    out[index].blue = in[index].red;
-//
-//    debug[index] = index;
-//}
-
-//convolution operation for a 5x5 kernel
+//convolution operation for a 9x9 kernel
 kernel void convolution(device const PPMPixel* img_in,
                         device PPMPixel* img_out,
                         device float* kern,
