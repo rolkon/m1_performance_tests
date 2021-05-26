@@ -116,6 +116,7 @@ For OpenMP the number of threads was set equal to the number of cores. For MPI t
 | MacBook Pro, M1 (2020) | macOS 11.3.1 | Rosetta @ 3.20GHz, 8 cores (2020) | 512 | (0.004, 1.110, 493.877) | (0.381, 0.529, 180.055) | (0.84, 5.723, 123.383) |
 | Colab | Ubuntu 18.04.5 LTS | Intel(R) Xeon(R) CPU @ 2.20GHz, 2 cores | 512 | (0.0059, 1.657, 1627.569) | (0.111, 2.524, 1717.255) | (0.062, 1.922, 1545.168) |
 | HP Laptop 15-db0460ur (2019) | Ubuntu 20.04.2 LTS | AMD A9-9425 RADEON R5, 5 COMPUTE CORES 2C+3G @ 3.1GHz, 2 cores (2016) | 512 | (0.007, 1.417, 3028.264) | (0.133, 3.417, 5844.955) | (0.029, 2.783, 3668.932) |
+| Dell XPS-15 L502x (2011) | Ubuntu 18.04 LTS | Intel i7-2720QM @ 2,2GHz, 4 cores | 512 | (0.007, 1.074, 996.566) | (0.33, 0.968, 519.845) | (0.161, 0.979, 405.633) |
 
 
 
