@@ -79,6 +79,10 @@ int main(){
 
     char* outputNames[3] = {"../data/8k_mountains_blurry_cuda.ppm", "../data/16k_forest_blurry_cuda.ppm", "../data/32k_death_valley_blurry_cuda.ppm"};
 
+    // from https://stackoverflow.com/questions/28112485/how-to-select-a-gpu-with-cuda/28113186
+
+    cudaSetDevice(1);
+
     cudaEvent_t start_copy, stop_copy, start_no_copy, stop_no_copy;
 
     cudaEventCreate(&start_copy);
@@ -116,7 +120,7 @@ int main(){
 
         cudaEventRecord(start_no_copy);
 
-        Convolution<<<16, 512>>>(d_img_data, d_res_data, d_kernel_box_blur, h_img[i]->x, h_img[i]->y);
+        Convolution<<<32, 1024>>>(d_img_data, d_res_data, d_kernel_box_blur, h_img[i]->x, h_img[i]->y);
         
         cudaEventRecord(stop_no_copy);
         
@@ -149,4 +153,4 @@ int main(){
     free(h_img[0]);
     free(h_img[1]);
     free(h_img[2]);
-}
+
